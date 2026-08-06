@@ -230,3 +230,16 @@ spending a screenshot round-trip on it.
 ```bash
 SHOULDER='{"x":135,"y":-8,"z":6}' ELBOW='{"x":-120,"y":0,"z":10}' WRIST='{"x":-20,"y":0,"z":0}' node scripts/fk_probe.mjs
 ```
+
+Two more, same idea, for authoring individual handshapes against a real ASL reference
+(used to get L/M/N/O to match the official chart precisely): `scripts/thumb_probe.mjs`
+builds just the thumb chain and prints which way it's actually reaching in hand-local
+space — the axis that decides "does the thumb open out to the side (L) or tuck under
+the fingers (M/N)" is not obvious from the raw Euler numbers alone. `scripts/circle_probe.mjs`
+builds the thumb AND the index finger and reports the literal gap between their
+tips, for letters like O where the two need to touch.
+
+```bash
+CMC='{"x":0,"y":0,"z":-30}' MCP=0 IP=0 node scripts/thumb_probe.mjs
+CMC='{"x":0,"y":-10,"z":55}' MCP=30 IP=15 IDX_MCP=68 IDX_PIP=73 IDX_DIP=58 node scripts/circle_probe.mjs
+```

@@ -100,25 +100,25 @@ export const AlphabetPoses = {
     desc: 'Pulgar e índice extendidos formando una L; los demás en puño.',
     wrist: { x: 0, y: 0, z: 0 },
     fingers: { index: finger(straight), middle: finger(curled), ring: finger(curled), pinky: finger(curled) },
-    thumb: thumb({ x: -18, y: -66, z: 34 }, 4, 2),
+    thumb: thumb({ x: 0, y: 0, z: -30 }, 0, 0),
   },
   M: {
     desc: 'Pulgar cubierto por índice, medio y anular doblados encima.',
     wrist: { x: 0, y: 0, z: 0 },
     fingers: { index: finger([96, 90, 68]), middle: finger([96, 90, 68]), ring: finger([96, 90, 68]), pinky: finger(curled) },
-    thumb: thumb({ x: 24, y: 6, z: -22 }, 70, 50),
+    thumb: thumb({ x: 0, y: -90, z: 70 }, 65, 50),
   },
   N: {
     desc: 'Pulgar cubierto por índice y medio doblados encima.',
     wrist: { x: 0, y: 0, z: 0 },
     fingers: { index: finger([96, 90, 68]), middle: finger([96, 90, 68]), ring: finger(curled), pinky: finger(curled) },
-    thumb: thumb({ x: 22, y: -2, z: -16 }, 62, 42),
+    thumb: thumb({ x: 0, y: -60, z: 55 }, 35, 20),
   },
   O: {
     desc: 'Todos los dedos curvados tocando el pulgar, formando un círculo.',
     wrist: { x: 0, y: 0, z: 0 },
-    fingers: { index: finger([54, 56, 46]), middle: finger([54, 56, 46]), ring: finger([54, 56, 46]), pinky: finger([54, 56, 46]) },
-    thumb: thumb({ x: -4, y: -22, z: 20 }, 46, 34),
+    fingers: { index: finger([68, 73, 58]), middle: finger([68, 73, 58]), ring: finger([68, 73, 58]), pinky: finger([68, 73, 58]) },
+    thumb: thumb({ x: 0, y: -10, z: 55 }, 30, 15),
   },
   P: {
     desc: 'Como la "K" pero apuntando hacia abajo.',
@@ -178,7 +178,10 @@ export const AlphabetPoses = {
     desc: 'Pulgar y meñique extendidos ("colgar diez"); los demás en puño.',
     wrist: { x: 0, y: 0, z: 0 },
     fingers: { index: finger(curled), middle: finger(curled), ring: finger(curled), pinky: finger(straight) },
-    thumb: thumb({ x: -14, y: -70, z: 40 }, 2, 0),
+    // y clamped to -50 explicitly (not -70) to reproduce this letter's
+    // exact pre-existing pose now that JOINT_LIMITS.thumbCmc.y was widened
+    // to -90 for M/N — Y wasn't part of this precision pass.
+    thumb: thumb({ x: -14, y: -50, z: 40 }, 2, 0),
   },
   Z: {
     desc: 'Índice extendido trazando una Z en el aire (seña dinámica).',

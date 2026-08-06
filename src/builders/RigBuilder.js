@@ -72,7 +72,7 @@ export const JOINT_LIMITS = {
   pipCurl: [0, 110],
   dipCurl: [0, 95],
   mcpSpread: [-20, 20],
-  thumbCmc: { x: [-40, 60], y: [-50, 50], z: [-30, 60] },
+  thumbCmc: { x: [-40, 60], y: [-90, 50], z: [-30, 75] },
   thumbMcp: [-10, 80],
   thumbIp: [0, 90],
   wrist: { x: [-45, 45], y: [-70, 70], z: [-35, 35] },
