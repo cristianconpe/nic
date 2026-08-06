@@ -1,0 +1,19 @@
+{
+  "name": "asl-avatar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Procedurally generated 3D ASL fingerspelling avatar built with Three.js — no external models, no Blender.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "shot": "node scripts/screenshot.mjs"
+  },
+  "dependencies": {
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}

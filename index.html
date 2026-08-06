@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASL Avatar — Procedural Sign Language Avatar</title>
+    <link rel="stylesheet" href="/src/ui/style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b0b0d'/%3E%3Ccircle cx='16' cy='11' r='6.5' fill='%23f3f3f1'/%3E%3Cpath d='M9 27c0-6 3-9 7-9s7 3 7 9' fill='%23f3f3f1'/%3E%3Ccircle cx='23' cy='19' r='3.4' fill='%23e3ab84'/%3E%3C/svg%3E"
+    />
+
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="scene"></canvas>
+
+      <div id="hud">
+        <div id="brand">
+          <span class="dot"></span>
+          <div>
+            <h1>ASL Avatar</h1>
+            <p>Procedural signing avatar &middot; Three.js</p>
+          </div>
+        </div>
+
+        <div id="letter-info">
+          <div id="letter-big">A</div>
+          <div id="letter-desc">Fist with thumb resting alongside the fingers.</div>
+        </div>
+      </div>
+
+      <div id="panel">
+        <div id="alphabet-grid"></div>
+        <div id="panel-footer">
+          <label class="toggle">
+            <input type="checkbox" id="autoplay-toggle" />
+            <span>Reproducir A→Z</span>
+          </label>
+          <div id="fps"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
