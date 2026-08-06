@@ -44,10 +44,10 @@ export const AvatarConfig = {
     wristJointRadius: 0.05,
     // Fixed "presentation" rest pose (degrees) so the signing hand reads
     // clearly to the viewer. Per-letter data only adds deltas on top of
-    // the wrist entry below.
-    restShoulder: { x: -18, y: 12, z: 72 },
-    restElbow: { x: 0, y: 12, z: -96 },
-    restWrist: { x: 0, y: 0, z: 4 },
+    // the wrist entry below. TUNING IN PROGRESS.
+    restShoulder: { x: 135, y: -8, z: 6 },
+    restElbow: { x: -120, y: 0, z: 10 },
+    restWrist: { x: -20, y: 0, z: 0 },
     // Left arm is the "resting" arm — ASL fingerspelling is one-handed, so
     // it just hangs relaxed at the side instead of mirroring the raised
     // signing pose (a 180ish deg flip around the shoulder's local X swings

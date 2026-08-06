@@ -16,9 +16,10 @@ npm install
 npm run dev      # http://localhost:5173
 ```
 
-Click a letter in the bottom panel, or check "Reproducir A→Z" to autoplay the whole
-alphabet. Drag to orbit, scroll to zoom — you can zoom in close enough to inspect
-individual knuckles.
+Type a word into the box above the avatar and hit ▶ to watch it fingerspelled letter by
+letter, or click a letter in the bottom panel directly, or check "Reproducir A→Z" to
+autoplay the whole alphabet. Drag to orbit, scroll to zoom — you can zoom in close
+enough to inspect individual knuckles.
 
 `npm run build` produces a static `dist/` bundle; there's no backend.
 
@@ -49,10 +50,14 @@ src/
   asl/
     AlphabetPoses.js      the A–Z data table (see below)
     PoseController.js     turns pose data into bone rotations, eases between letters
+    TextParser.js         text -> sequence of {letter} / {pause} steps
+    AnimationQueue.js      sequence -> timed playback, via callback (no avatar knowledge)
   core/
     SceneManager.js       renderer/camera/controls/animation loop (no avatar knowledge)
   ui/
-    UIPanel.js, style.css HUD + letter grid, framework-free DOM
+    UIPanel.js             A-Z grid + autoplay toggle
+    TextSignPanel.js       text box, Play/Replay/Clear, letter-progress chips
+    style.css
   main.js                 wires it all together
 ```
 
@@ -104,11 +109,24 @@ root -> spine -> chest -> neckBase -> neck -> head
                                                    -> hand.{S}.pinky.{mcp,pip,dip}
 ```
 
-The right arm (`R`) is the signing arm and holds a fixed "presentation" rest pose
-(raised, elbow bent, palm toward the viewer) defined once in `AvatarConfig.arm.rest*`.
-The left arm hangs relaxed at the side. Only the right hand's fingers/thumb/wrist are
-driven by letter data — this matches how ASL fingerspelling is actually signed
-(one-handed).
+The right arm (`R`) is the signing arm and holds a fixed anatomical rest pose defined
+once in `AvatarConfig.arm.rest*`: shoulder close to its natural hang (a ~135° bend off
+the bone's "straight up" bind axis, not a raised/lifted shoulder), most of the lift done
+by elbow flexion, and a small wrist correction so the palm reads flat toward the viewer.
+The hand ends up at roughly shoulder height, just in front of the chest — the interpretation
+zone between chest, shoulder and chin — instead of reaching up above the head. The left
+arm hangs fully relaxed at the side. Only the right hand's fingers/thumb/wrist are driven
+by letter data — this matches how ASL fingerspelling is actually signed (one-handed), and
+per-letter wrist deltas (used by e.g. G/H/P/Q to rotate the hand sideways or downward) are
+layered on top of this rest pose as small offsets, so they didn't need to change when the
+rest pose did.
+
+Tuning a 3-bone arm chain by eyeballing screenshots doesn't converge fast — Euler angles
+on a bent chain aren't intuitive. `scripts/fk_probe.mjs` builds the same
+shoulder→foreArm→hand bone chain headlessly (no renderer) and prints the hand's world
+position plus its palm-normal/finger-direction vectors for a given set of angles, so the
+rest pose was solved numerically (hand height in the chest/shoulder band, palm normal
+≈ +Z) before ever taking a screenshot to confirm it visually.
 
 ## ASL pose data
 
@@ -138,13 +156,48 @@ J and Z are historically **traced**, not static, handshapes; they're included wi
 their nearest static approximation and a note in the description, ready to become real
 motion curves once word-level animation is added.
 
+## Text-to-sign playback
+
+Typing a word doesn't touch the avatar directly — it flows through a decoupled pipeline
+that mirrors the one used for the A→Z demo button:
+
+```
+Text --[TextParser]--> Sequence --[AnimationQueue]--> onLetter(letter) --[PoseController]--> Avatar
+```
+
+- **`TextParser.parseText(text)`** knows nothing about 3D. It turns a string into an
+  array of `{ type: 'letter', letter }` / `{ type: 'pause', ms }` steps, uppercasing and
+  dropping any character with no defined handshape (digits, punctuation — only the
+  manual alphabet exists today). Consecutive whitespace collapses into one pause so word
+  gaps read as a single beat, not a stutter.
+- **`AnimationQueue`** turns that sequence into a timed performance. It only knows about
+  `setTimeout` and a step index — it calls `onLetter(letter, index)` and `onStep(index)`
+  at the right moments and has no reference to a `Rig`, a `PoseController`, or a scene.
+  `main.js` is the only place that wires `onLetter` to `pose.setLetter(letter)`, which is
+  what actually moves the avatar (and reuses `PoseController`'s existing easing, so
+  letter-to-letter transitions are already smooth).
+- **`TextSignPanel`** is DOM-only: the input box, Play/Replay/Clear buttons above the
+  avatar, and the small per-letter progress chips. It parses on every keystroke (so the
+  chips preview the sequence before you even hit play) and calls `onPlay(sequence)` —
+  same shape as `UIPanel`'s `onSelect(letter)` for a single click.
+
+Because none of these layers hold a reference to the ones below them, the text box
+could be swapped for a speech-to-text input, a scripted demo sequence, or a websocket
+feed without touching `PoseController`, the rig, or a single geometry file. Playback
+sources are mutually exclusive by convention, not by coupling: clicking a letter, or
+starting A→Z autoplay, calls `queue.stop()` first, and starting the text queue calls
+`ui.stopAutoplay()` — both are one-line calls in `main.js`, the only file that knows all
+three UI pieces exist.
+
 ## Extending to words
 
-The architecture is meant to carry straight through:
+Fingerspelling full words already works end to end (see above). The architecture is
+meant to carry straight through to real ASL vocabulary next:
 
-1. **Coarticulation** — `PoseController` already blends between two full hand poses;
-   driving it from a sequence of letters (or word-level handshapes) instead of one
-   click is the same code path.
+1. **Word-level signs, not just spelled-out letters** — `AlphabetPoses` is a lookup
+   table from a key to a pose; a `WordSigns` table with the same shape (keyed by word
+   instead of letter) would let `TextParser` emit a whole-word step when it recognizes
+   one, falling back to fingerspelling letter-by-letter otherwise.
 2. **Motion signs** (like J/Z, or real ASL vocabulary) — add a position/rotation
    *keyframe track* per bone instead of a single target, and have `PoseController`
    interpolate along it over the sign's duration.
@@ -166,4 +219,14 @@ number, look again).
 npm run dev &
 LETTER=F OUT_FILE=f.png npm run shot
 CAM_POS="0.5,1.8,0.4" CAM_TARGET="0.2,1.7,-0.1" npm run shot   # close-up on the hand
+```
+
+`scripts/fk_probe.mjs` is the numeric counterpart, used for the arm chain specifically:
+it builds the shoulder→foreArm→hand bones with no renderer at all and prints the hand's
+world position and orientation for a given set of rest-pose angles, so a new arm pose
+can be solved for (hand height, forward clearance from the torso, palm direction) before
+spending a screenshot round-trip on it.
+
+```bash
+SHOULDER='{"x":135,"y":-8,"z":6}' ELBOW='{"x":-120,"y":0,"z":10}' WRIST='{"x":-20,"y":0,"z":0}' node scripts/fk_probe.mjs
 ```

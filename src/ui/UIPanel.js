@@ -8,8 +8,9 @@ const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
  * Deliberately framework-free — a handful of DOM calls doesn't need React.
  */
 export default class UIPanel {
-  constructor({ onSelect }) {
+  constructor({ onSelect, onAutoplayStart }) {
     this.onSelect = onSelect;
+    this.onAutoplayStart = onAutoplayStart;
     this.grid = document.getElementById('alphabet-grid');
     this.letterBig = document.getElementById('letter-big');
     this.letterDesc = document.getElementById('letter-desc');
@@ -22,9 +23,19 @@ export default class UIPanel {
     this._autoplayIndex = 0;
 
     this.autoplayToggle.addEventListener('change', () => {
-      if (this.autoplayToggle.checked) this._startAutoplay();
-      else this._stopAutoplay();
+      if (this.autoplayToggle.checked) {
+        this.onAutoplayStart?.();
+        this._startAutoplay();
+      } else {
+        this._stopAutoplay();
+      }
     });
+  }
+
+  /** Public hook so other playback sources (the text queue) can silence the A→Z autoplay. */
+  stopAutoplay() {
+    this.autoplayToggle.checked = false;
+    this._stopAutoplay();
   }
 
   _buildGrid() {
@@ -33,8 +44,7 @@ export default class UIPanel {
       btn.className = 'letter-btn';
       btn.textContent = letter;
       btn.addEventListener('click', () => {
-        this.autoplayToggle.checked = false;
-        this._stopAutoplay();
+        this.stopAutoplay();
         this.onSelect(letter);
       });
       this.grid.appendChild(btn);
