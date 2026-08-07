@@ -88,6 +88,17 @@ state, and it's just numbers.
 
 Nothing has hard edges by construction; there was no beveling step to remember.
 
+**Hand size.** The hands are intentionally bigger than strict anatomy — `HAND_SCALE`
+in `AvatarConfig.js` (currently 1.25) scales every hand/finger/thumb dimension so the
+handshape stays legible without needing to zoom in for every letter. It's a genuine
+remodel, not a runtime `.scale()` on the hand bone: every length, radius, and base
+offset in `hand`/`fingers`/`thumb` is multiplied by the same constant, so finger
+proportions and joint spacing scale together correctly, and per-letter poses (all
+expressed as rotations, not positions) don't need to change at all. The forearm keeps
+its own unscaled size — only `arm.wristJointRadius` gets a smaller, separate bump
+(`WRIST_BRIDGE_SCALE`, 1.12) so the joint sphere tapers smoothly into the larger palm
+instead of the palm suddenly stepping up in size right where the wrist meets it.
+
 ## The rig
 
 This is a **rigid-segment rig**: every bone is a real `THREE.Bone`, and body meshes are

@@ -5,6 +5,15 @@
  * torso, neck, head and arms always meet at consistent seams without each
  * file hardcoding the neighbor's numbers.
  */
+// Hands read as the focal point of a signing avatar, so they're built
+// noticeably larger than strict anatomy would give — legibility of the
+// handshape beats realism here. Only the hand/finger/thumb geometry is
+// scaled; the forearm keeps its own size and the wrist joint gets a
+// smaller, partial bump so it reads as a natural taper into the bigger
+// hand rather than a sudden jump in radius.
+const HAND_SCALE = 1.25;
+const WRIST_BRIDGE_SCALE = 1.12;
+
 export const AvatarConfig = {
   torso: {
     baseY: 0,
@@ -41,7 +50,7 @@ export const AvatarConfig = {
     foreLength: 0.285,
     foreBaseRadius: 0.062,
     foreTipRadius: 0.05,
-    wristJointRadius: 0.05,
+    wristJointRadius: 0.05 * WRIST_BRIDGE_SCALE,
     // Fixed "presentation" rest pose (degrees) so the signing hand reads
     // clearly to the viewer. Per-letter data only adds deltas on top of
     // the wrist entry below. TUNING IN PROGRESS.
@@ -57,28 +66,49 @@ export const AvatarConfig = {
     restWristMirror: { x: 0, y: 0, z: 0 },
   },
   hand: {
-    palmLength: 0.1,
-    palmWidth: 0.105,
-    palmThickness: 0.032,
+    palmLength: 0.1 * HAND_SCALE,
+    palmWidth: 0.105 * HAND_SCALE,
+    palmThickness: 0.032 * HAND_SCALE,
     palmRoundness: 0.62,
     fingerRadialSegments: 18,
     fingerCapSegments: 8,
   },
   // base: [x offset across the palm (pinky-side negative -> thumb-side positive), y offset added to palmLength for the knuckle arc]
+  // All distances scaled by HAND_SCALE so fingers stay proportionally
+  // placed on the now-larger palm — only the multiplier changed here,
+  // not the underlying hand shape or finger proportions relative to each other.
   fingers: {
-    index: { base: [0.024, 0.006], lengths: [0.041, 0.026, 0.021], radii: [0.0105, 0.0088, 0.0072] },
-    middle: { base: [0.004, 0.012], lengths: [0.046, 0.029, 0.023], radii: [0.0108, 0.009, 0.0074] },
-    ring: { base: [-0.017, 0.004], lengths: [0.042, 0.027, 0.021], radii: [0.0102, 0.0086, 0.007] },
-    pinky: { base: [-0.037, -0.01], lengths: [0.034, 0.021, 0.018], radii: [0.0088, 0.0074, 0.0062] },
+    index: {
+      base: [0.024 * HAND_SCALE, 0.006 * HAND_SCALE],
+      lengths: [0.041 * HAND_SCALE, 0.026 * HAND_SCALE, 0.021 * HAND_SCALE],
+      radii: [0.0105 * HAND_SCALE, 0.0088 * HAND_SCALE, 0.0072 * HAND_SCALE],
+    },
+    middle: {
+      base: [0.004 * HAND_SCALE, 0.012 * HAND_SCALE],
+      lengths: [0.046 * HAND_SCALE, 0.029 * HAND_SCALE, 0.023 * HAND_SCALE],
+      radii: [0.0108 * HAND_SCALE, 0.009 * HAND_SCALE, 0.0074 * HAND_SCALE],
+    },
+    ring: {
+      base: [-0.017 * HAND_SCALE, 0.004 * HAND_SCALE],
+      lengths: [0.042 * HAND_SCALE, 0.027 * HAND_SCALE, 0.021 * HAND_SCALE],
+      radii: [0.0102 * HAND_SCALE, 0.0086 * HAND_SCALE, 0.007 * HAND_SCALE],
+    },
+    pinky: {
+      base: [-0.037 * HAND_SCALE, -0.01 * HAND_SCALE],
+      lengths: [0.034 * HAND_SCALE, 0.021 * HAND_SCALE, 0.018 * HAND_SCALE],
+      radii: [0.0088 * HAND_SCALE, 0.0074 * HAND_SCALE, 0.0062 * HAND_SCALE],
+    },
   },
   thumb: {
     // [cmc/thenar stub, proximal phalanx, distal phalanx]
-    lengths: [0.02, 0.034, 0.028],
-    radii: [0.0145, 0.0122, 0.0098],
-    baseOffset: [0.034, -0.03, 0.016],
+    lengths: [0.02 * HAND_SCALE, 0.034 * HAND_SCALE, 0.028 * HAND_SCALE],
+    radii: [0.0145 * HAND_SCALE, 0.0122 * HAND_SCALE, 0.0098 * HAND_SCALE],
+    baseOffset: [0.034 * HAND_SCALE, -0.03 * HAND_SCALE, 0.016 * HAND_SCALE],
     // Rest orientation of the thumb's CMC bone relative to the palm plane
     // (degrees) — rotates it out of the finger plane so it can oppose them.
     // Right hand and its mirror (thumb sits on the opposite radial side).
+    // Unchanged: rotations aren't sizes, and every letter's thumb pose was
+    // tuned against this orientation — scaling geometry doesn't move it.
     restRotation: { x: -8, y: -14, z: -62 },
     restRotationMirror: { x: -8, y: 14, z: 62 },
   },
