@@ -256,3 +256,13 @@ tips, for letters like O where the two need to touch.
 CMC='{"x":0,"y":0,"z":-30}' MCP=0 IP=0 node scripts/thumb_probe.mjs
 CMC='{"x":0,"y":-10,"z":55}' MCP=30 IP=15 IDX_MCP=68 IDX_PIP=73 IDX_DIP=58 node scripts/circle_probe.mjs
 ```
+
+One more: `scripts/main_camera_shot.mjs` screenshots a letter zoomed in on the hand along
+the *exact* viewing direction of the app's real default camera (same angle SceneManager
+starts with, just closer) rather than an arbitrary close-up angle. Matters when a pose
+is being checked against a 2D reference image — a pose can look right from a nicer angle
+and still be wrong from the one the app actually uses.
+
+```bash
+LETTER=G DIST=1.0 node scripts/main_camera_shot.mjs
+```

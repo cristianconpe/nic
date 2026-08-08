@@ -92,6 +92,13 @@ export default class PoseController {
     );
     rig.setLocalEulerDeg(`hand.${side}.thumb.mcp`, flat['thumb.mcp'] || 0, 0, 0);
     rig.setLocalEulerDeg(`hand.${side}.thumb.ip`, flat['thumb.ip'] || 0, 0, 0);
+
+    rig.setLocalPositionOffset(
+      `hand.${side}.thumb.cmc`,
+      flat['thumb.basePos.x'] || 0,
+      flat['thumb.basePos.y'] || 0,
+      flat['thumb.basePos.z'] || 0
+    );
   }
 }
 
@@ -122,6 +129,11 @@ function flatten(pose) {
   flat['thumb.cmc.z'] = clamp(t.cmc.z, JOINT_LIMITS.thumbCmc.z);
   flat['thumb.mcp'] = clamp(pctToDeg(t.mcp, JOINT_LIMITS.thumbMcp[1]), JOINT_LIMITS.thumbMcp);
   flat['thumb.ip'] = clamp(pctToDeg(t.ip, JOINT_LIMITS.thumbIp[1]), JOINT_LIMITS.thumbIp);
+
+  const basePos = t.basePos || {};
+  flat['thumb.basePos.x'] = basePos.x || 0;
+  flat['thumb.basePos.y'] = basePos.y || 0;
+  flat['thumb.basePos.z'] = basePos.z || 0;
 
   return flat;
 }

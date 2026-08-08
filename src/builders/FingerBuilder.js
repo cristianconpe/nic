@@ -40,12 +40,6 @@ export default class FingerBuilder {
     const bones = [];
     let parent = parentBone;
 
-    if (knuckleRadius) {
-      const knuckle = makeMesh(createJointSphere(knuckleRadius, { widthSegments: 20, heightSegments: 16 }), material);
-      knuckle.position.set(...baseOffset);
-      parentBone.add(knuckle);
-    }
-
     for (let i = 0; i < jointNames.length; i++) {
       const bone = i === 0
         ? Rig.bind(new THREE.Bone(), baseRotationDeg.x, baseRotationDeg.y, baseRotationDeg.z)
@@ -54,6 +48,15 @@ export default class FingerBuilder {
 
       if (i === 0) {
         bone.position.set(...baseOffset);
+        Rig.bindPosition(bone); // lets a pose nudge this joint's anchor point, not just its rotation
+        if (knuckleRadius) {
+          // Parented to the bone itself (not parentBone) so it stays glued to
+          // the joint if a pose ever offsets the bone's bind position — a
+          // sphere has no rotation to speak of, so inheriting the bone's
+          // baseRotationDeg here is visually a no-op.
+          const knuckle = makeMesh(createJointSphere(knuckleRadius, { widthSegments: 20, heightSegments: 16 }), material);
+          bone.add(knuckle);
+        }
       } else {
         bone.position.set(0, lengths[i - 1], 0);
       }

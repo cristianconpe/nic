@@ -61,6 +61,28 @@ export class Rig {
     return bone;
   }
 
+  /**
+   * Stores a bone's rest/bind LOCAL POSITION (meters) so a pose can nudge
+   * *where a joint is anchored* — not just how it's rotated — without
+   * touching the geometry that set that position in the first place. Used
+   * sparingly: today only a bone's own base offset (e.g. the thumb's CMC
+   * attachment point) needs this, for the rare pose that reads wrong
+   * because the anchor itself sits in the wrong spot on the palm, not
+   * because of its rotation.
+   */
+  static bindPosition(bone) {
+    bone.userData.bindPosition = bone.position.clone();
+    return bone;
+  }
+
+  /** Sets a bone's local position from a bind position + a small per-letter offset (meters). Requires bindPosition() to have been called on it. */
+  setLocalPositionOffset(name, dx = 0, dy = 0, dz = 0) {
+    const bone = this.get(name);
+    const bind = bone.userData.bindPosition;
+    if (!bind) throw new Error(`Rig: bone "${name}" has no bind position — call Rig.bindPosition() on it first`);
+    bone.position.set(bind.x + dx, bind.y + dy, bind.z + dz);
+  }
+
   allNames() {
     return Array.from(this.bones.keys());
   }
@@ -75,7 +97,7 @@ export const JOINT_LIMITS = {
   thumbCmc: { x: [-40, 60], y: [-90, 50], z: [-30, 75] },
   thumbMcp: [-10, 80],
   thumbIp: [0, 90],
-  wrist: { x: [-45, 45], y: [-70, 70], z: [-35, 35] },
+  wrist: { x: [-45, 45], y: [-70, 70], z: [-70, 70] },
 };
 
 export function clamp(value, [min, max]) {
