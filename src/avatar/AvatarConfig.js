@@ -5,14 +5,16 @@
  * torso, neck, head and arms always meet at consistent seams without each
  * file hardcoding the neighbor's numbers.
  */
-// Hands read as the focal point of a signing avatar, so they're built
+// Hands are the whole point of a signing avatar, so they're built
 // noticeably larger than strict anatomy would give — legibility of the
 // handshape beats realism here. Only the hand/finger/thumb geometry is
 // scaled; the forearm keeps its own size and the wrist joint gets a
-// smaller, partial bump so it reads as a natural taper into the bigger
-// hand rather than a sudden jump in radius.
-const HAND_SCALE = 1.25;
-const WRIST_BRIDGE_SCALE = 1.12;
+// smaller, partial bump (a fraction of the hand's growth, not the full
+// amount) so it reads as a taper into the bigger hand rather than either
+// a sudden jump in radius or the whole forearm looking stretched.
+// 1.85 = a ~48% bump over the previous 1.25 pass, in the requested 40-60% range.
+const HAND_SCALE = 1.85;
+const WRIST_BRIDGE_SCALE = 1 + (HAND_SCALE - 1) * 0.4;
 
 export const AvatarConfig = {
   torso: {
