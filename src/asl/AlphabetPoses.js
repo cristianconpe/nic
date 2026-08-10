@@ -79,9 +79,9 @@ export const AlphabetPoses = {
   },
   H: {
     desc: 'Índice y medio extendidos juntos, apuntando hacia el costado.',
-    wrist: { x: 4, y: 78, z: 0 },
+    wrist: { x: -15, y: 0, z: 60 },
     fingers: { index: finger(straight, -6), middle: finger(straight, 6), ring: finger(curled), pinky: finger(curled) },
-    thumb: thumb({ x: -8, y: 10, z: 6 }, 58, 36),
+    thumb: thumb({ x: -8, y: 10, z: 6 }, 58, 36, { x: 0, y: 0.045, z: 0 }),
   },
   I: {
     desc: 'Meñique extendido hacia arriba; los demás dedos en puño.',
@@ -99,7 +99,7 @@ export const AlphabetPoses = {
     desc: 'Índice y medio en V, pulgar tocando la base del medio.',
     wrist: { x: 0, y: 0, z: 0 },
     fingers: { index: finger(straight, -14), middle: finger(straight, 14), ring: finger(curled), pinky: finger(curled) },
-    thumb: thumb({ x: -18, y: -6, z: 30 }, 22, 12),
+    thumb: thumb({ x: -20, y: -20, z: 55 }, 30, 15),
   },
   L: {
     desc: 'Pulgar e índice extendidos formando una L; los demás en puño.',
@@ -109,15 +109,15 @@ export const AlphabetPoses = {
   },
   M: {
     desc: 'Pulgar cubierto por índice, medio y anular doblados encima.',
-    wrist: { x: 0, y: 0, z: 0 },
-    fingers: { index: finger([96, 90, 68]), middle: finger([96, 90, 68]), ring: finger([96, 90, 68]), pinky: finger(curled) },
+    wrist: { x: 45, y: 0, z: 0 },
+    fingers: { index: finger([100, 5, 5]), middle: finger([100, 5, 5]), ring: finger([100, 5, 5]), pinky: finger([100, 90, 80]) },
     thumb: thumb({ x: 0, y: -90, z: 70 }, 65, 50),
   },
   N: {
     desc: 'Pulgar cubierto por índice y medio doblados encima.',
-    wrist: { x: 0, y: 0, z: 0 },
-    fingers: { index: finger([96, 90, 68]), middle: finger([96, 90, 68]), ring: finger(curled), pinky: finger(curled) },
-    thumb: thumb({ x: 0, y: -60, z: 55 }, 35, 20),
+    wrist: { x: 45, y: 0, z: 10 },
+    fingers: { index: finger([100, 5, 5]), middle: finger([100, 5, 5]), ring: finger([100, 90, 80]), pinky: finger([100, 90, 80]) },
+    thumb: thumb({ x: 0, y: -90, z: 70 }, 65, 50),
   },
   O: {
     desc: 'Todos los dedos curvados tocando el pulgar, formando un círculo.',
