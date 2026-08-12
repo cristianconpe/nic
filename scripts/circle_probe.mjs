@@ -18,12 +18,16 @@ function pctToDeg(pct, max) {
   return (THREE.MathUtils.clamp(pct, -100, 100) / 100) * max;
 }
 
-function thumbTip(cmcDelta, mcpPct, ipPct) {
+function thumbTip(cmcDelta, mcpPct, ipPct, basePos = { x: 0, y: 0, z: 0 }) {
   const cx = clamp(cmcDelta.x || 0, JOINT_LIMITS.thumbCmc.x);
   const cy = clamp(cmcDelta.y || 0, JOINT_LIMITS.thumbCmc.y);
   const cz = clamp(cmcDelta.z || 0, JOINT_LIMITS.thumbCmc.z);
   const cmc = new THREE.Bone();
-  cmc.position.set(t.baseOffset[0], t.baseOffset[1], t.baseOffset[2]);
+  cmc.position.set(
+    t.baseOffset[0] + (basePos.x || 0),
+    t.baseOffset[1] + (basePos.y || 0),
+    t.baseOffset[2] + (basePos.z || 0)
+  );
   cmc.rotation.set(deg2rad(t.restRotation.x + cx), deg2rad(t.restRotation.y + cy), deg2rad(t.restRotation.z + cz));
   const mcp = new THREE.Bone();
   mcp.position.set(0, t.lengths[0], 0);
@@ -42,9 +46,13 @@ function thumbTip(cmcDelta, mcpPct, ipPct) {
   return p;
 }
 
-function indexTip(mcpPct, pipPct, dipPct, spreadPct = 0) {
+function indexTip(mcpPct, pipPct, dipPct, spreadPct = 0, idxBasePos = { x: 0, y: 0, z: 0 }) {
   const mcp = new THREE.Bone();
-  mcp.position.set(idx.base[0], AvatarConfig.hand.palmLength + idx.base[1], AvatarConfig.hand.palmThickness * 0.08);
+  mcp.position.set(
+    idx.base[0] + (idxBasePos.x || 0),
+    AvatarConfig.hand.palmLength + idx.base[1] + (idxBasePos.y || 0),
+    AvatarConfig.hand.palmThickness * 0.08 + (idxBasePos.z || 0)
+  );
   const curlMcp = clamp(pctToDeg(mcpPct, JOINT_LIMITS.mcpCurl[1]), JOINT_LIMITS.mcpCurl);
   const spread = clamp(pctToDeg(spreadPct, JOINT_LIMITS.mcpSpread[1]), JOINT_LIMITS.mcpSpread);
   mcp.rotation.set(deg2rad(curlMcp), 0, deg2rad(spread));
@@ -76,11 +84,16 @@ const idxMcp = Number(process.env.IDX_MCP || 54);
 const idxPip = Number(process.env.IDX_PIP || 56);
 const idxDip = Number(process.env.IDX_DIP || 46);
 const idxSpread = Number(process.env.IDX_SPREAD || 0);
+const basePos = JSON.parse(process.env.BASE_POS || '{"x":0,"y":0,"z":0}');
+const idxBasePos = JSON.parse(process.env.IDX_BASE_POS || '{"x":0,"y":0,"z":0}');
 
-const tt = thumbTip(cmcDelta, mcpPct, ipPct);
-const it = indexTip(idxMcp, idxPip, idxDip, idxSpread);
+const tt = thumbTip(cmcDelta, mcpPct, ipPct, basePos);
+const it = indexTip(idxMcp, idxPip, idxDip, idxSpread, idxBasePos);
 const gap = tt.distanceTo(it);
 
 console.log(`thumb tip:  (${tt.x.toFixed(3)}, ${tt.y.toFixed(3)}, ${tt.z.toFixed(3)})`);
 console.log(`index tip:  (${it.x.toFixed(3)}, ${it.y.toFixed(3)}, ${it.z.toFixed(3)})`);
-console.log(`gap: ${gap.toFixed(4)} m  (thumb radius ~0.010, index tip radius ~0.007 -> touching at roughly <=0.017)`);
+const touchThreshold = t.radii[2] + idx.radii[2];
+console.log(
+  `gap: ${gap.toFixed(4)} m  (thumb tip radius ${t.radii[2].toFixed(4)} + index tip radius ${idx.radii[2].toFixed(4)} -> touching at roughly <=${touchThreshold.toFixed(4)})`
+);

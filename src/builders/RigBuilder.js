@@ -97,7 +97,7 @@ export const JOINT_LIMITS = {
   thumbCmc: { x: [-40, 60], y: [-90, 50], z: [-30, 75] },
   thumbMcp: [-10, 80],
   thumbIp: [0, 90],
-  wrist: { x: [-45, 45], y: [-70, 70], z: [-70, 70] },
+  wrist: { x: [-95, 95], y: [-120, 120], z: [-175, 175] },
 };
 
 export function clamp(value, [min, max]) {

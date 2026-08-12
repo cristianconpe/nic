@@ -21,8 +21,13 @@ const straight = [0, 0, 0];
 const curled = [92, 92, 82];
 const hook = [15, 88, 82]; // bent at the two outer joints, base joint stays low
 
-function finger(curl, spread = 0) {
-  return { curl, spread };
+function finger(curl, spread = 0, basePos = null) {
+  // basePos is the same rare escape hatch as the thumb's: {x,y,z} in
+  // meters, nudging where this finger's MCP knuckle is anchored on the
+  // palm (not its rotation). Only touch this when a pose reads right in
+  // curl/spread but the whole hand needs a longer visual bridge between
+  // the fingers and the wrist than the rig's normal anatomy provides.
+  return { curl, spread, basePos };
 }
 
 function thumb(cmc, mcp = 0, ip = 0, basePos = null) {
@@ -121,21 +126,36 @@ export const AlphabetPoses = {
   },
   O: {
     desc: 'Todos los dedos curvados tocando el pulgar, formando un círculo.',
-    wrist: { x: 0, y: 0, z: 0 },
-    fingers: { index: finger([68, 73, 58]), middle: finger([68, 73, 58]), ring: finger([68, 73, 58]), pinky: finger([68, 73, 58]) },
-    thumb: thumb({ x: 0, y: -10, z: 55 }, 30, 15),
+    wrist: { x: -20, y: -90, z: 0 },
+    fingers: {
+      index: finger([50, 55, 45], 15, { x: 0, y: -0.08, z: 0 }),
+      middle: finger([50, 55, 45], 5, { x: 0, y: -0.08, z: 0 }),
+      ring: finger([50, 55, 45], -5, { x: 0, y: -0.08, z: 0 }),
+      pinky: finger([50, 55, 45], -15, { x: 0, y: -0.08, z: 0 }),
+    },
+    thumb: thumb({ x: 0, y: -10, z: 55 }, 25, 12, { x: -0.015, y: 0.02, z: 0.06 }),
   },
   P: {
-    desc: 'Como la "K" pero apuntando hacia abajo.',
-    wrist: { x: -92, y: 4, z: 0 },
-    fingers: { index: finger(straight, -14), middle: finger(straight, 14), ring: finger(curled), pinky: finger(curled) },
-    thumb: thumb({ x: -18, y: -6, z: 30 }, 22, 12),
+    desc: 'Como la "K" pero apuntando hacia abajo, pulgar tocando el índice.',
+    wrist: { x: 90, y: -10, z: 70 },
+    fingers: {
+      index: finger([100, 0, 0], 0),
+      middle: finger([20, 15, 10], 0),
+      ring: finger([55, 15, 10], -6),
+      pinky: finger([20, 15, 10], 0),
+    },
+    thumb: thumb({ x: -10, y: -10, z: 35 }, 80, 40, { x: -0.01, y: 0.14, z: 0.03 }),
   },
   Q: {
-    desc: 'Como la "G" pero apuntando hacia abajo.',
-    wrist: { x: -92, y: 6, z: 0 },
-    fingers: { index: finger(straight, -8), middle: finger(curled), ring: finger(curled), pinky: finger(curled) },
-    thumb: thumb({ x: -10, y: -46, z: 30 }, 6, 4),
+    desc: 'Como la "P" pero con índice y pulgar separados y el resto oculto.',
+    wrist: { x: 90, y: -10, z: 70 },
+    fingers: {
+      index: finger([100, 0, 0], 0),
+      middle: finger(curled, 0),
+      ring: finger(curled, 0),
+      pinky: finger(curled, 0),
+    },
+    thumb: thumb({ x: -10, y: -10, z: 35 }, 60, 20),
   },
   R: {
     desc: 'Índice y medio cruzados; los demás dedos en puño.',
@@ -147,7 +167,7 @@ export const AlphabetPoses = {
     desc: 'Puño cerrado con el pulgar cruzado por delante de los dedos.',
     wrist: { x: 0, y: 0, z: 0 },
     fingers: { index: finger(curled), middle: finger(curled), ring: finger(curled), pinky: finger(curled) },
-    thumb: thumb({ x: 26, y: 26, z: -30 }, 34, 20),
+    thumb: thumb({ x: 0, y: -60, z: 60 }, 55, 35, { x: 0, y: 0.08, z: 0.01 }),
   },
   T: {
     desc: 'Pulgar entre el índice y el medio, con el puño cerrado encima.',

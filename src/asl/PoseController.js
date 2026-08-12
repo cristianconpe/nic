@@ -82,6 +82,12 @@ export default class PoseController {
         const spreadDeg = flat[`${key}.spread`] || 0;
         rig.setLocalEulerDeg(`hand.${side}.${name}.${joint}`, curlDeg, 0, spreadDeg);
       }
+      rig.setLocalPositionOffset(
+        `hand.${side}.${name}.mcp`,
+        flat[`${name}.basePos.x`] || 0,
+        flat[`${name}.basePos.y`] || 0,
+        flat[`${name}.basePos.z`] || 0
+      );
     }
 
     rig.setLocalEulerDeg(
@@ -121,6 +127,10 @@ function flatten(pose) {
     flat[`${name}.pip.curl`] = CURL_SIGN * clamp(pctToDeg(pipP, JOINT_LIMITS.pipCurl[1]), JOINT_LIMITS.pipCurl);
     flat[`${name}.dip.curl`] = CURL_SIGN * clamp(pctToDeg(dipP, JOINT_LIMITS.dipCurl[1]), JOINT_LIMITS.dipCurl);
     flat[`${name}.mcp.spread`] = SPREAD_SIGN * clamp(pctToDeg(f.spread, JOINT_LIMITS.mcpSpread[1]), JOINT_LIMITS.mcpSpread);
+    const fBasePos = f.basePos || {};
+    flat[`${name}.basePos.x`] = fBasePos.x || 0;
+    flat[`${name}.basePos.y`] = fBasePos.y || 0;
+    flat[`${name}.basePos.z`] = fBasePos.z || 0;
   }
 
   const t = pose.thumb;
