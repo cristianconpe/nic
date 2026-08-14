@@ -173,7 +173,7 @@ export const AlphabetPoses = {
     desc: 'Pulgar entre el índice y el medio, con el puño cerrado encima.',
     wrist: { x: 0, y: 0, z: 0 },
     fingers: { index: finger([90, 82, 68]), middle: finger(curled), ring: finger(curled), pinky: finger(curled) },
-    thumb: thumb({ x: 18, y: -4, z: -4 }, 48, 28),
+    thumb: thumb({ x: -30, y: 0, z: 70 }, 40, 30),
   },
   U: {
     desc: 'Índice y medio juntos extendidos hacia arriba.',
@@ -209,10 +209,15 @@ export const AlphabetPoses = {
     thumb: thumb({ x: -14, y: -50, z: 40 }, 2, 0),
   },
   Z: {
-    desc: 'Índice extendido trazando una Z en el aire (seña dinámica).',
+    desc: 'Índice apuntando hacia la cámara, trazando una Z en el aire (seña dinámica).',
     wrist: { x: 0, y: 0, z: 0 },
-    fingers: { index: finger(straight), middle: finger(curled), ring: finger(curled), pinky: finger(curled) },
-    thumb: thumb({ x: 6, y: -10, z: 8 }, 42, 30),
+    fingers: {
+      index: finger([75, 5, 0], 15),
+      middle: finger(curled, 0, { x: 0, y: 0, z: -0.06 }),
+      ring: finger(curled, 0, { x: 0, y: 0, z: -0.06 }),
+      pinky: finger(curled, 0, { x: 0, y: 0, z: -0.06 }),
+    },
+    thumb: thumb({ x: 0, y: 10, z: 55 }, 45, 25),
   },
 };
 
