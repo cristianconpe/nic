@@ -5,7 +5,6 @@ import AvatarBuilder from './builders/AvatarBuilder.js';
 import PoseController from './asl/PoseController.js';
 import { AlphabetPoses } from './asl/AlphabetPoses.js';
 import AnimationQueue from './asl/AnimationQueue.js';
-import UIPanel from './ui/UIPanel.js';
 import TextSignPanel from './ui/TextSignPanel.js';
 
 const canvas = document.getElementById('scene');
@@ -21,14 +20,30 @@ sceneManager.scene.add(avatarGroup);
 const pose = new PoseController(rig, 'R');
 pose.setLetter('A', { animate: false });
 
+const letterBigEl = document.getElementById('letter-big');
+const letterDescEl = document.getElementById('letter-desc');
+letterBigEl.textContent = 'A';
+letterDescEl.textContent = AlphabetPoses.A.desc || '';
+pose.onLetterChange = (letter, data) => {
+  letterBigEl.textContent = letter;
+  letterDescEl.textContent = data.desc || '';
+};
+
+// --- Playback speed: only affects timing (how long a hold/transition takes),
+// never the poses themselves. holdMs/transitionMs are plain public fields on
+// AnimationQueue; PoseController's per-letter blend duration is passed in on
+// every onLetter call so it always matches the queue's current transitionMs.
+const BASE_HOLD_MS = 650;
+const BASE_TRANSITION_MS = 450;
+
 // --- Playback: Text -> TextParser -> Sequence -> AnimationQueue -> Avatar ---
 // AnimationQueue never touches the rig/PoseController directly — it only
 // calls back with (letter, index); this module is the one place that wires
 // "play this letter" to an actual pose.
 const queue = new AnimationQueue({
-  holdMs: 650,
-  transitionMs: 460,
-  onLetter: (letter) => pose.setLetter(letter),
+  holdMs: BASE_HOLD_MS,
+  transitionMs: BASE_TRANSITION_MS,
+  onLetter: (letter) => pose.setLetter(letter, { duration: queue.transitionMs / 1000 }),
   onStep: (index) => textPanel.setActiveIndex(index),
   onDone: () => {
     textPanel.setPlaying(false);
@@ -39,46 +54,19 @@ const queue = new AnimationQueue({
 
 const textPanel = new TextSignPanel({
   onPlay: (sequence) => {
-    ui.stopAutoplay();
-    queue.load(sequence);
-    textPanel.setPlaying(true);
-    queue.play();
-  },
-  onReplay: (sequence) => {
-    ui.stopAutoplay();
     queue.load(sequence);
     textPanel.setPlaying(true);
     queue.play();
   },
   onStop: () => queue.stop(),
-});
-
-const ui = new UIPanel({
-  onSelect: (letter) => {
-    queue.stop();
-    pose.setLetter(letter);
+  onSpeedChange: (speed) => {
+    queue.holdMs = BASE_HOLD_MS / speed;
+    queue.transitionMs = BASE_TRANSITION_MS / speed;
   },
-  onAutoplayStart: () => queue.stop(),
 });
-ui.setActiveLetter('A', AlphabetPoses.A.desc);
-pose.onLetterChange = (letter, data) => ui.setActiveLetter(letter, data.desc);
-
-let fpsAccum = 0;
-let fpsFrames = 0;
-let fpsTimer = 0;
 
 sceneManager.onTick((dt) => {
   pose.update(dt);
-
-  fpsAccum += dt;
-  fpsFrames++;
-  fpsTimer += dt;
-  if (fpsTimer > 0.5) {
-    ui.setFps(fpsFrames / fpsAccum);
-    fpsAccum = 0;
-    fpsFrames = 0;
-    fpsTimer = 0;
-  }
 });
 
 sceneManager.start();
